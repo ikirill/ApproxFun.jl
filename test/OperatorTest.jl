@@ -35,6 +35,11 @@ using ApproxFun, BlockBandedMatrices,  LinearAlgebra, Test
         testbandedoperator(A)
 
         @test norm(A\Fun(x.*f,rangespace(A))-(x.*f)) < 100eps()
+
+        let u1 = Fun(Ultraspherical(1)), u2 = Fun(Ultraspherical(2))
+            @test Conversion(space(u1), space(u2)) * u1 ≈ u2
+            @test_broken Conversion(space(u2), space(u1)) * u2 ≈ u1
+        end
     end
 
     @testset "Derivative" begin
@@ -304,5 +309,14 @@ using ApproxFun, BlockBandedMatrices,  LinearAlgebra, Test
 
         M = Multiplication(x, JacobiWeight(0,0,Chebyshev()))
         @test exp(M).f == Multiplication(exp(x), Chebyshev()).f
+    end
+
+    @testset "Legendre" begin
+        I = Interval()
+        x, dx = Fun(identity, I), Derivative(I)
+        u = -sqrt(1-x^2)
+        @test_broken ((dx * Multiplication(1-x^2) * dx) * u)(0.5) ≈ 1/sqrt(3)
+        L = dx[1-x^2]*dx - 1/(1-x^2)
+        @test_broken isfinite(norm(L[1:4,1:4]))
     end
 end
