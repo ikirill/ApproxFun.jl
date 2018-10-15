@@ -39,6 +39,7 @@ using ApproxFun, BlockBandedMatrices,  LinearAlgebra, Test
         let u1 = Fun(Ultraspherical(1)), u2 = Fun(Ultraspherical(2))
             @test Conversion(space(u1), space(u2)) * u1 ≈ u2
             @test_broken Conversion(space(u2), space(u1)) * u2 ≈ u1
+            @test_broken isfinite(Conversion(space(u2), space(u1))[1,1])
         end
     end
 
